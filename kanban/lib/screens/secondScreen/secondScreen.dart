@@ -1,11 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kanban/bloc/kanban_bloc.dart';
-import 'package:kanban/bloc/kanban_repository.dart';
 import 'package:kanban/helpers/models.dart';
+import 'package:kanban/screens/loginScreen/login_bloc/kanban_bloc.dart';
+import 'package:kanban/screens/loginScreen/login_bloc/kanban_repository.dart';
 
 class ListScreen extends StatefulWidget {
-  ListScreen({Key? key}) : super(key: key);
+  String? token;
+  ListScreen({Key? key, this.token})
+      : super(
+          key: key,
+        );
 
   @override
   _ListScreenState createState() => _ListScreenState();

@@ -4,15 +4,17 @@ import 'package:kanban/helpers/exceptions.dart';
 import 'package:kanban/helpers/models.dart';
 
 class KanbanProvider {
-  Future<KanbanModels> getRandom() async {
+  Future postLoginData(json) async {
+    print(json);
     try {
       ApiRequester requester = ApiRequester();
-      Response response = await requester.toGet();
+      Response response = await requester.toPost(json);
       if (response.statusCode == 200) {
-        return KanbanModels.fromJson(response.data);
+        return TokenModel.fromJson(response.data);
       }
       throw KanbanExceptions.catchError(response);
     } catch (e) {
+      print(e);
       throw KanbanExceptions.catchError(e);
     }
   }
