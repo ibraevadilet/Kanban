@@ -8,7 +8,7 @@ class KanbanProvider {
     print(json);
     try {
       ApiRequester requester = ApiRequester();
-      Response response = await requester.toPost(json);
+      Response response = await requester.toPost("users/login/", json);
       if (response.statusCode == 200) {
         return TokenModel.fromJson(response.data);
       }

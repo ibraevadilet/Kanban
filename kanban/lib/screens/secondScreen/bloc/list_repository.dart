@@ -3,8 +3,8 @@ import 'package:kanban/screens/loginScreen/login_bloc/kanban_provider.dart';
 import 'package:kanban/screens/secondScreen/bloc/list_provider.dart';
 
 class ListRepository {
-  Future<KanbanModels> getKanban() {
+  Future<List<KanbanModels>> getKanban(tabIndex) {
     ListProvider provider = ListProvider();
-    return provider.getKanban();
+    return provider.getKanban(tabIndex);
   }
 }

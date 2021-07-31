@@ -1,5 +1,5 @@
 class TokenModel {
-  String? token;
+  dynamic? token;
 
   TokenModel({this.token});
 

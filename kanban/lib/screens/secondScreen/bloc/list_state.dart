@@ -3,14 +3,14 @@ part of 'list_bloc.dart';
 @immutable
 abstract class ListState {}
 
-class ListInitial extends ListState {}
+class ListLoading extends ListState {}
 
 class ListLoaded extends ListState {
-  final KanbanModels model;
+  final List<KanbanModels> model;
   ListLoaded(this.model);
 }
 
-class KanbanError extends ListState {
+class ListError extends ListState {
   final KanbanExceptions message;
-  KanbanError(this.message);
+  ListError(this.message);
 }

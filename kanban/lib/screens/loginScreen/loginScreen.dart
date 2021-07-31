@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kanban/screens/loginScreen/login_bloc/kanban_bloc.dart';
 import 'package:kanban/screens/loginScreen/login_bloc/kanban_repository.dart';
+import 'package:kanban/screens/secondScreen/bloc/list_bloc.dart';
 import 'package:kanban/screens/secondScreen/secondScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen();
+  // const LoginScreen();
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginScreenState createState() => new _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -18,27 +19,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final bloc = KanbanBloc(KanbanRepository());
   TextEditingController _username = new TextEditingController();
   TextEditingController _password = new TextEditingController();
-  static const String token = "token";
-  SharedPreferences? _prefs;
-  String tokenPref = "";
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   SharedPreferences.getInstance()
-  //     ..then((prefs) {
-  //       setState(() => this._prefs = prefs);
-  //       loadToken();
-  //     });
-  // }
-
-  // String username = '';
-  // String password = '';
-  // String valueUsername = 'armada';
-  // String valuePassword = 'FSH6zBZ0p9yH';
+  String username = '';
+  String password = '';
+  String valueUsername = 'armada';
+  String valuePassword = 'FSH6zBZ0p9yH';
 
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: Colors.grey[800],
           title: Text("Kanban"),
         ),
@@ -49,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: EdgeInsets.symmetric(horizontal: 30),
           child: Form(
             key: formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+            // autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -65,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
   Widget buildUsername() => TextFormField(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: _username,
         toolbarOptions:
             ToolbarOptions(paste: true, cut: true, selectAll: true, copy: true),
@@ -86,11 +76,11 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.circular(40),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red, width: 2),
+            borderSide: BorderSide(color: Colors.grey, width: 2),
             borderRadius: BorderRadius.circular(40),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red, width: 2),
+            borderSide: BorderSide(color: Colors.green, width: 2),
             borderRadius: BorderRadius.circular(40),
           ),
           errorStyle: TextStyle(color: Colors.red),
@@ -102,10 +92,11 @@ class _LoginScreenState extends State<LoginScreen> {
             return null;
           }
         },
-        // onChanged: (values) => setState(() => username = values),
+        onChanged: (values) => setState(() => username = values),
       );
 
   Widget buildPassword() => TextFormField(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: _password,
         toolbarOptions:
             ToolbarOptions(copy: true, paste: true, cut: true, selectAll: true),
@@ -115,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
           hintText: 'Enter your password',
           hintStyle: TextStyle(color: Colors.white),
           border: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red, width: 2),
+            borderSide: BorderSide(color: Colors.grey, width: 2),
             borderRadius: BorderRadius.circular(40),
           ),
           errorBorder: OutlineInputBorder(
@@ -127,11 +118,11 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.circular(40),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red, width: 2),
+            borderSide: BorderSide(color: Colors.grey, width: 2),
             borderRadius: BorderRadius.circular(40),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red, width: 2),
+            borderSide: BorderSide(color: Colors.green, width: 2),
             borderRadius: BorderRadius.circular(40),
           ),
         ),
@@ -142,63 +133,51 @@ class _LoginScreenState extends State<LoginScreen> {
             return null;
           }
         },
-        // onChanged: (value) => setState(() => password = value),
         keyboardType: TextInputType.visiblePassword,
         obscureText: true,
+        onChanged: (value) => setState(() => password = value),
       );
 
   Widget buildSum(BuildContext context) {
     return BlocListener(
         bloc: bloc,
         listener: (context, state) async {
-          if (state is KanbanInitial) {
-            InkWell(
-              onTap: () {
-                bloc.add(
-                  PostKanbanEvent(
-                      username: _username.toString(),
-                      password: _password.toString()),
-                );
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TestScreen(
-                              tokenPref: tokenPref,
-                            )));
-              },
-              child: Container(
-                alignment: Alignment.center,
-                height: 60,
-                width: 900,
-                decoration: BoxDecoration(
-                    color: Colors.greenAccent[400],
-                    borderRadius: BorderRadius.circular(40)),
-                child: Text(
-                  "Log in",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            );
-          } else if (state is Authorization) {
+          if (state is Authorization) {
             {
               SharedPreferences _prefs = await SharedPreferences.getInstance();
-              _prefs.setString(token, tokenPref.toString());
+              _prefs.setString("token", state.tokenModel.token.toString());
             }
+          } else if (state is ListError) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(state.message.message.toString()),
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: 'Повторить заново',
+                onPressed: () {},
+              ),
+            ));
           }
         },
         child: InkWell(
           onTap: () {
             bloc.add(
               PostKanbanEvent(
-                  username: _username.toString(),
-                  password: _password.toString()),
+                  username: _username.text, password: _password.text),
             );
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => TestScreen(
-                          tokenPref: tokenPref,
-                        )));
+
+            if (valueUsername == username && valuePassword == password) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => new ListScreen()));
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Неправильный логин или пароль"),
+                duration: const Duration(seconds: 5),
+                action: SnackBarAction(
+                  label: 'Повторить заново',
+                  onPressed: () {},
+                ),
+              ));
+            }
           },
           child: Container(
             alignment: Alignment.center,
@@ -214,79 +193,22 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ));
   }
-
-  // Widget buildSubmit() => BlocListener(
-  //       listener: (context, state) async {
-  //         if (state is Authorization) {
-  //           SharedPreferences _prefs = await SharedPreferences.getInstance();
-  //           _prefs.setString(token, tokenPref.toString());
-  //         }
-  //       },
-  //       child: InkWell(
-  //         onTap: () {
-  //           bloc.add(
-  //             PostKanbanEvent(
-  //                 username: _username.toString(),
-  //                 password: _password.toString()),
-  //           );
-  //           Navigator.push(
-  //               context,
-  //               MaterialPageRoute(
-  //                   builder: (context) => TestScreen(
-  //                         tokenPref: tokenPref,
-  //                       )));
-  //         },
-  //         child: Container(
-  //           alignment: Alignment.center,
-  //           height: 60,
-  //           width: 900,
-  //           decoration: BoxDecoration(
-  //               color: Colors.greenAccent[400],
-  //               borderRadius: BorderRadius.circular(40)),
-  //           child: Text(
-  //             "Log in",
-  //             style: TextStyle(fontSize: 18),
-  //           ),
-  //         ),
-  //       ),
-  //     );
-
-  // Future<Null> _setTokenPref(String value) async {
-  //   await this._prefs!.setString(token, value);
-  // }
-
-  // void loadToken() {
-  //   setState(() {
-  //     this.tokenPref = this._prefs!.getString(token) ?? "";
-  //   });
-  // }
 }
 
-class TestScreen extends StatelessWidget {
-  String? tokenPref;
-  TestScreen({Key? key, this.tokenPref}) : super(key: key);
+class TestScreen extends StatefulWidget {
+  TestScreen({Key? key}) : super(key: key);
 
+  @override
+  _TestScreenState createState() => _TestScreenState();
+}
+
+class _TestScreenState extends State<TestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text(tokenPref.toString()),
+        child: Text(''),
       ),
     );
   }
 }
-// if (valueUsername == username || valuePassword == password) {
-              //   Navigator.push(context,
-              //       MaterialPageRoute(builder: (context) => ListScreen()));
-              // } else {
-              //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              //     content: const Text('Введен неправильный логин или пароль'),
-              //     duration: const Duration(seconds: 5),
-              //     action: SnackBarAction(
-              //       label: 'Повторить заново',
-              //       onPressed: () {},
-              //     ),
-              //   ));
-              // }
-
-              

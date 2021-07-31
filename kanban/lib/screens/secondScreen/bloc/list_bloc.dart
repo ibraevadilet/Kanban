@@ -11,7 +11,7 @@ part 'list_state.dart';
 
 class ListBloc extends Bloc<ListEvent, ListState> {
   ListRepository repository = ListRepository();
-  ListBloc() : super(ListLoaded(KanbanModels()));
+  ListBloc() : super(ListLoading());
 
   @override
   Stream<ListState> mapEventToState(
@@ -19,12 +19,13 @@ class ListBloc extends Bloc<ListEvent, ListState> {
   ) async* {
     try {
       if (event is GetListEvent) {
-        // yield ListInitial();
-        KanbanModels data = await repository.getKanban();
+        var tabIndex = {"row": event.tabIndex};
+        yield ListLoading();
+        List<KanbanModels> data = await repository.getKanban(tabIndex);
         yield ListLoaded(data);
       }
     } catch (e) {
-      yield KanbanError(KanbanExceptions.catchError(e));
+      yield ListError(KanbanExceptions.catchError(e));
     }
   }
 }
